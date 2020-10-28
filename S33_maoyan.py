@@ -2,6 +2,9 @@ import requests
 import re
 from fontTools.ttLib import TTFont
 import os
+import xml.dom.minidom as xmldom
+
+
 #获取字体下载url
 def get_url():
     url = 'https://maoyan.com/board/1'
@@ -35,9 +38,6 @@ def woff_xml(font_file_name):
     # 转换成xml格式
     base_font.saveXML("fonts/"+font_file_name+".xml")
 
-
-#处理xml内容
-
 #猫眼字符库
 font_num_dit = [
     {'code':'uniE06C','num':'1'},{'code':'uniE845','num':'4'},{'code':'uniE824','num':'9'},
@@ -67,6 +67,18 @@ def get_num_dic(font_file_name):
                 num = font_num_dit[j]['num']
                 num_dic.append({'code':new_font_unicode_list[i].replace('uni','&#x').lower()+';','num':num})
     return num_dic
+#解析xml提取出数字的编码
+def read_xml(font_file_name):
+    xmlfilepath = os.path.abspath("fonts/"+font_file_name+".xml")
+    print(xmlfilepath)
+    domobj = xmldom.parse(xmlfilepath)
+    elementobj = domobj.documentElement
+    subElementObj = elementobj.getElementsByTagName("TTGlyph")
+    for i in range(1, 11):
+        namee = subElementObj[i].getAttribute("name")
+        print(i, namee)
+
+
 
 #主程序，挨个调用子程序
 def main():
@@ -74,6 +86,6 @@ def main():
     download_woff(url,font_file_name)
     woff_xml(font_file_name)
     #get_num_dic(font_file_name)
-
+    read_xml(font_file_name)
 if __name__ == '__main__':
     main()
