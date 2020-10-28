@@ -1,7 +1,7 @@
 import requests
 import re
 from fontTools.ttLib import TTFont
-
+import os
 #获取字体下载url
 def get_url():
     url = 'https://maoyan.com/board/1'
@@ -13,29 +13,67 @@ def get_url():
     #print(html)
     font_file_name = re.findall(r'//vfile.meituan.net/colorstone/(\w+\.woff)', html)[0]
     url = 'http://vfile.meituan.net/colorstone/' + font_file_name
-    #print(url)
-    return url
+    # print(url)
+    # print(font_file_name)
+    return url,font_file_name
 
 #下载字体
-def download_woff(url):
-    woff = requests.get(url)
-    with open("2.woff",'wb') as wofff:
-        wofff.write(woff.content)
-
+def download_woff(url,font_file_name):
+    #固定命名，呆的一笔……
+    # woff = requests.get(url)
+    # with open("2.woff",'wb') as wofff:
+    #     wofff.write(woff.content)
+    #取消固定的命名，改为匹配当次文件名字保存
+    test = requests.get(url)
+    if os.path.exists('fonts/'+font_file_name):
+        return font_num_dit
+    with open('fonts/'+ font_file_name, 'wb') as testt:
+        testt.write(test.content)
 #把woff转换为可读的xml文件
-def woff_xml():
-    base_font = TTFont("2.woff")
+def woff_xml(font_file_name):
+    base_font = TTFont("fonts/"+font_file_name)
     # 转换成xml格式
-    base_font.saveXML("2.xml")
+    base_font.saveXML("fonts/"+font_file_name+".xml")
+
 
 #处理xml内容
 
+#猫眼字符库
+font_num_dit = [
+    {'code':'uniE06C','num':'1'},{'code':'uniE845','num':'4'},{'code':'uniE824','num':'9'},
+    {'code':'uniE2BC','num':'6'},{'code':'uniE40C','num':'5'},{'code':'uniE40C','num':'5'},
+    {'code':'uniE989','num':'7'},{'code':'uniEAD5','num':'0'},{'code':'uniEB90','num':'2'},
+    {'code':'uniED28','num':'7'},{'code':'uniE114','num':'7'},{'code':'uniE180','num':'6'},
+    {'code':'uniE628','num':'2'},{'code':'uniE8FB','num':'1'},{'code':'uniE948','num':'5'},
+    {'code':'uniEDC1','num':'8'},{'code':'uniEE76','num':'4'},{'code':'uniF00C','num':'3'},
+    {'code':'uniF54D','num':'0'},{'code':'uniF65F','num':'9'},{'code':'','num':''},
+]
+
+#print(font_num_dit)
+def get_num_dic(font_file_name):
+    num_dic = []
+    # with open('fonts/'+font_file_name,'wb') as f:
+    #     f.write(font_file)
+    old_font=TTFont('fonts/93d5fd748686d98bbe54a5e1a9d83bd72272.woff')
+    new_font=TTFont('fonts/'+font_file_name)
+    new_font_unicode_list = new_font.getGlyphOrder()[2:]#前面两个不是数字对应的编码去除掉
+
+    for i in range(len(new_font_unicode_list)):
+        news = new_font['glyf'][new_font_unicode_list[i]]
+        for j in range(len(new_font_unicode_list)):
+            olds = old_font['glyf'][font_num_dit[j]]['code']
+            if news == olds:
+                #对象相同，把数字给新的编码
+                num = font_num_dit[j]['num']
+                num_dic.append({'code':new_font_unicode_list[i].replace('uni','&#x').lower()+';','num':num})
+    return num_dic
+
 #主程序，挨个调用子程序
 def main():
-    url = get_url()
-    download_woff(url)
-    woff_xml()
-
+    url,font_file_name = get_url()
+    download_woff(url,font_file_name)
+    woff_xml(font_file_name)
+    #get_num_dic(font_file_name)
 
 if __name__ == '__main__':
     main()
