@@ -14,3 +14,7 @@
 猫眼这个字体加密是爬不动了，真的爬不动了
 
 pybloom这个东西下载就没成功过……淦
+
+写46爬评论和词云时候发现女神一位
+![image](https://github.com/YuanTutu/XiaoShuaiBi/blob/main/Images/sanjicaihua.jpg)
+三吉彩花
